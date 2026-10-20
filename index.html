@@ -102,6 +102,12 @@ ol.sub ::marker{color:var(--accent);font-weight:700}
 .cmd-title{display:flex;gap:.65rem;align-items:baseline}
 .cmd-title .idx{font-family:var(--font-code);font-size:.8rem;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:5px;padding:.05rem .45rem;flex:none}
 .cmd-title p{line-height:1.65}
+/* 長いコマンドや出力例の最小幅で、親のグリッドを押し広げない。 */
+.wrap,.steps,.step-body,.cmds,.cmd-item{grid-template-columns:minmax(0,1fr)}
+.wrap > *,.steps > *,.step-body > *,.cmds > *,.cmd-item > *{min-width:0}
+.cmd-title p{min-width:0;overflow-wrap:anywhere}
+.term{min-width:0;max-width:100%}
+.callout,.after,.hint{overflow-wrap:anywhere}
 .term{background:var(--term);color:var(--term-ink);border:1px solid var(--term-line);border-radius:10px;overflow:hidden}
 .line{display:flex;align-items:center;gap:.75rem;padding:.65rem .7rem .65rem 1rem}
 .line ~ .line{border-top:1px solid var(--term-line)}
