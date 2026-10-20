@@ -669,7 +669,6 @@ branch 'main' set up to track 'origin/main'.</pre></div>
   function setStatus(kind, text){ urlSt.setAttribute('data-kind', kind); urlSt.textContent = text; }
   function onUrl(){
     var raw = urlIn.value.trim();
-    store.set('gp.url', raw);
     state.URL = ''; state.REPO = '';
     if (!raw){
       setStatus('idle','まだ貼られていません。GitHub の画面で HTTPS の URL をコピーして貼ってください。');
@@ -710,8 +709,8 @@ branch 'main' set up to track 'origin/main'.</pre></div>
     });
   });
 
-  var saved = store.get('gp.url');
-  if (saved){ urlIn.value = saved; }
+  // 別の生徒・リポジトリの URL を引き継がず、毎回空欄から始める。
+  urlIn.value = '';
   onUrl();
 })();
 </script>
