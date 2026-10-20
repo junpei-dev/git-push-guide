@@ -105,6 +105,9 @@ ol.sub ::marker{color:var(--accent);font-weight:700}
 .term{background:var(--term);color:var(--term-ink);border:1px solid var(--term-line);border-radius:10px;overflow:hidden}
 .line{display:flex;align-items:center;gap:.75rem;padding:.65rem .7rem .65rem 1rem}
 .line ~ .line{border-top:1px solid var(--term-line)}
+[data-cmd^="Worker 名"]{flex-direction:column;align-items:stretch}
+[data-cmd^="Worker 名"] .copy{order:-1;align-self:flex-end}
+[data-cmd^="Worker 名"] .code-wrap{white-space:pre-wrap;max-height:32rem;overflow:auto}
 .code-wrap{flex:1;min-width:0;overflow-x:auto;white-space:nowrap;font-family:var(--font-code);font-size:.95rem;line-height:1.6;padding:.15rem 0}
 .ps{color:var(--term-dim);user-select:none;-webkit-user-select:none;margin-right:.55em}
 .code{color:var(--term-ink)}
@@ -175,12 +178,12 @@ dl.fix dd .term{margin-top:.45rem}
   <header class="head">
     <p class="eyebrow">プログラミング技術 ・ デプロイ編</p>
     <h1>はじめての <span class="mono">git push</span></h1>
-    <p class="lead">作ったアプリを GitHub に送るまでの手順です。上から順番に進めてください。コマンドは「コピー」を押して、ターミナルに貼り付けて Enter で実行します。</p>
+    <p class="lead">Kiro で作ったアプリを GitHub に送り、Cloudflare Workers で公開する手順です。上から順番に進めてください。コマンドは「コピー」を押して、ターミナルに貼り付けて Enter で実行します。</p>
     <ol class="flow" aria-label="全体の流れ">
       <li><span class="ref">手順 1</span>GitHub でリポジトリを作る</li>
       <li><span class="ref">手順 2</span>Kiro で準備する</li>
       <li><span class="ref">手順 3〜5</span>コマンドで GitHub に送る</li>
-      <li class="later"><span class="ref">このあと</span>Cloudflare でつなぐ</li>
+      <li><span class="ref">手順 6</span>Workers で公開する</li>
     </ol>
   </header>
 
@@ -189,11 +192,12 @@ dl.fix dd .term{margin-top:.45rem}
     <p>git に「だれが記録したか」を教えておく設定です。まず次のコマンドで、設定済みか確かめます。</p>
     <div class="term">
       <div class="line" data-cmd="git config --global user.name"><div class="code-wrap"><span class="ps" aria-hidden="true">PS C:\…&gt;</span><span class="code"></span></div><button class="copy" type="button">コピー</button></div>
-      <div class="out"><div class="out-cap">名前が表示されたら</div><p class="blank">設定済みです。このボックスは飛ばして手順1へ。何も出なければ、下の2つを設定します。</p></div>
+      <div class="out"><div class="out-cap">名前が表示されたら</div><p class="blank">名前に加えて下のメール確認コマンドでも値が出れば設定済みです。両方とも自分の設定なら手順1へ。未設定の項目を設定してください。</p></div>
     </div>
+    <div class="term"><div class="line" data-cmd="git config --global user.email"><div class="code-wrap"><span class="ps" aria-hidden="true">PS C:\…&gt;</span><span class="code"></span></div><button class="copy" type="button">コピー</button></div></div>
     <div class="fields">
       <div class="field">
-        <label for="git-name">GitHub のユーザー名</label>
+        <label for="git-name">コミットに記録する名前（GitHub のユーザー名など）</label>
         <input id="git-name" type="text" autocomplete="off" spellcheck="false" placeholder="例：taro-miyazaki">
       </div>
       <div class="field">
@@ -207,6 +211,13 @@ dl.fix dd .term{margin-top:.45rem}
       <div class="line" data-cmd="git config --global user.email &quot;{EMAIL}&quot;"><div class="code-wrap"><span class="ps" aria-hidden="true">PS C:\…&gt;</span><span class="code"></span></div><button class="copy" type="button">コピー</button></div>
       <div class="out"><div class="out-cap">こうなれば成功</div><p class="blank">どちらも何も表示されなければ設定できています。</p></div>
     </div>
+  </section>
+
+  <section class="once" aria-labelledby="retry-h">
+    <h2 id="retry-h">一度試した人が、新しいリポジトリでやり直すとき</h2>
+    <p>作ったアプリのフォルダーをそのまま使えます。<strong>リポジトリを作り直すだけでは、Pages 用設定は変わりません。</strong>手順2のプロンプトで Kiro に既存設定も Workers 用に直してもらいます。</p>
+    <ol class="sub"><li>手順1で空のリポジトリを新しく作り、その URL をこのページに貼る。以前の URL が残っていたら貼り替える。</li><li>手順2のページ内プロンプトをコピーして Kiro に送る。新しい Worker 名になっていることを確認する。</li><li>設定の修正と検証後、手順4を進める。既に Git 管理されていても .git を削除する必要はない。git init が Reinitialized と表示されても既存の管理情報を使って進められる。</li><li>4-6 では既に送り先がある人は「やり直す人」のコマンドを使い、新しい URL に変更する。</li><li>Cloudflare では新しい <strong>Worker</strong> を作り、新しいリポジトリを接続する。既存の Pages プロジェクトはそのままでは Worker に切り替わらない。</li></ol>
+    <p>新しい名前は以前と区別できるもの（例：my-quiz-app-v2）にすると確認しやすくなります。古いリポジトリや公開サイトは、この作業のために削除する必要はありません。チェック済み表示が残っていても、今回は各手順を確認し直してください。</p>
   </section>
 
   <div class="steps">
@@ -237,12 +248,69 @@ dl.fix dd .term{margin-top:.45rem}
         <div class="step-head"><h2 id="h-2">Kiro で準備する</h2><label class="done"><input type="checkbox" data-done="2">できた</label></div>
         <ol class="sub">
           <li>Kiro でアプリのフォルダを開く</li>
-          <li><strong>新しいチャット</strong>を開き、先生が配った <code class="inline">デプロイ用プロンプト.txt</code> の中身を貼る</li>
-          <li>1行目の「リポジトリ名：」の後ろを <span class="slot-text" data-slot="REPO"></span> に書き換えてから送信する</li>
-          <li>Kiro が <code class="inline">wrangler.jsonc</code> と <code class="inline">.gitignore</code> を作り終わるまで待つ</li>
-          <li>最後に Kiro が教えてくれる「ビルドコマンド」と「デプロイコマンド」をメモしておく（Cloudflare で使う）</li>
+          <li><strong>新しいチャット</strong>を開き、下の「Kiro 用プロンプト」の「コピー」を押して貼る。別のテキストファイルを開く必要はありません</li>
+          <li>1行目の「Worker 名：」の後ろを <span class="slot-text" data-slot="REPO"></span> に書き換えてから送信する。末尾の <code class="inline">.git</code> は付けない</li>
+          <li>Kiro の構成確認を読む。サーバー処理がある場合は対応方針を先生と確認する。静的アプリは設定と検証が終わるまで待つ</li>
+          <li>Kiro の検証結果と、Worker 名・ビルドコマンド・デプロイコマンド・ルートディレクトリをメモする。未確認・エラーがあれば先生に見せる</li>
         </ol>
-        <div class="callout info"><b>なぜ先に Kiro？</b>　<code class="inline">wrangler.jsonc</code> が入っていない状態で送ると、Cloudflare でのデプロイが必ず失敗します。送る前にそろえておきます。</div>
+        <div class="callout info"><b>なぜ先に Kiro？</b>　公開するフォルダーを Workers に伝えるためです。設定なしでも自動設定される場合はありますが、授業では明示して確認します。静的アプリは <code class="inline">assets.directory</code> を使います。<code class="inline">pages_build_output_dir</code> は Pages 専用です。</div>
+<div class="cmd-item" id="kiro-prompt"><h3>Kiro 用プロンプト</h3><p><strong>この欄だけで読んでコピーできます。</strong>　手順1の URL を入れると Worker 名も入ります。長い文章は欄の中をスクロールして読めます。「コピー」で全文をコピーし、Kiro の新しいチャットに貼ってください。以前 Pages 用に準備したアプリにも使えます。送信前に1行目を確認してください。</p><div class="term"><div class="line" data-cmd="Worker 名：{REPO}
+
+Kiro で開いているこのアプリを、Cloudflare Workers の Git 連携（Workers Builds）で公開する準備をしてください。Cloudflare Pages は使いません。公開作業と Git の操作は私が行います。
+
+【0. 以前 Pages 向けに準備したアプリも Workers 向けに直す】
+このフォルダーには以前のデプロイ設定が残っている可能性があります。新しい GitHub リポジトリを作るだけでは、アプリ内の Pages 用設定は変わりません。既存設定・package.json の scripts・フレームワークのアダプター・Pages Functions（functions/ や _worker.js 等）を調べ、Workers 用への移行対象を明示してください。
+静的アプリの Pages 用設定は次の手順で Workers Static Assets 用に修正してください。サーバー処理がある場合は機能を保つ Workers 対応が必要なので、分類 C として扱ってください。古い設定を残したまま新規ファイルを追加して完了にしないでください。
+Cloudflare 上の既存 Pages プロジェクトを Worker に変換したとは言わないでください。新しい Worker の作成と Git 接続は私が画面で行います。既存の Pages プロジェクトは削除しないでください。
+.git フォルダーや Git 履歴は削除しないでください。新しいリポジトリへの送り先変更が必要な可能性を最後に知らせてください。
+
+【1. まず実際の構成を調べる】
+package.json、ロックファイル、ビルド設定、既存の Wrangler 設定、サーバー処理、API、環境変数を確認してください。ファイルの中身を見ずに Vite や dist と決めつけないでください。
+次のどれに該当するか、根拠のファイル名と一緒に短く説明してください。
+A：HTML・CSS・JavaScript をそのまま配信できるアプリ
+B：Vite などでビルドして静的ファイルを配信するアプリ
+C：SSR・API・認証・データベースなどのサーバー処理を含むアプリ
+C は静的ファイルだけに変更して機能を失わせないでください。Workers 対応の公式アダプター等が必要なら説明し、機能変更・外部サービス追加・費用が伴う対応は私に確認してください。以下の静的配信の設定を機械的に適用しないでください。
+
+【2. A または B は Workers Static Assets を設定する】
+既存の wrangler.jsonc / wrangler.json / wrangler.toml を確認し、利用する設定ファイルを1つに整理してください。既存の bindings、環境別設定等を無断で消さないでください。
+・name は上の Worker 名と一致させる。.git、URL、日本語、大文字、アンダースコアを含めない。この授業では半角小文字・数字・ハイフンで、先頭末尾は英数字、63文字以内とする。不正な名前や未入力なら確認する。
+・compatibility_date は既存値があれば尊重し、新規なら作業日の YYYY-MM-DD を指定する。
+・assets.directory は実際に公開する静的フォルダーを指定する。B はビルド後の出力先（Vite の標準なら ./dist）。A は index.html と必要な画像等が揃う公開専用フォルダーを使う。プロジェクト全体 ./ を公開しない。
+・pages_build_output_dir は Pages 専用なので、Workers 向けの assets.directory に置き換える。wrangler pages deploy、Pages 用アダプターも使わない。
+・静的ファイルのみなら main や assets.binding は追加しない。ブラウザー用 src/main.ts を Worker の main にしない。
+・URL による画面切り替えがある SPA だけ、必要性を確認して assets.not_found_handling を single-page-application にする。すべてのアプリに付けない。
+・公開フォルダーに秘密情報やサーバーソースを入れない。
+
+Vite の標準的な静的アプリの例（出力先を確認してから使う）：
+{
+  &quot;name&quot;: &quot;my-quiz-app&quot;,
+  &quot;compatibility_date&quot;: &quot;作業日の YYYY-MM-DD に置き換える&quot;,
+  &quot;assets&quot;: { &quot;directory&quot;: &quot;./dist&quot; }
+}
+
+【3. 依存関係と Git の除外設定】
+既存のパッケージ管理方式とロックファイルを使ってください。npm のプロジェクトでは Wrangler を開発依存に追加し、package.json と package-lock.json に検証したバージョンを固定してください。既存依存の一括更新はしないでください。
+.gitignore は既存内容を残し、node_modules/、.wrangler/、.env、.env.*、.dev.vars、.dev.vars.* を除外する。.env.example 等の値のない見本は必要に応じ例外にする。
+ビルドで再生成する dist/ 等は除外する。ただし A の手書きの公開フォルダーは除外しない。画像・音声・必要なロックファイルも除外しない。
+除外設定を追加しても、既に Git 管理されているファイルは除外されない点を説明し、該当する場合は私に知らせる。秘密の値は画面に出さない。
+
+【4. 公開せず検証する】
+必要な依存関係をインストールし、B は実際にビルドする。出力先に index.html と必要なファイルがあることを確認する。
+選んだ設定で npx wrangler deploy --dry-run を実行する（npm の場合）。実際の deploy、ログイン、Cloudflare 設定変更は行わない。
+失敗したら原因を直し、再確認する。ネットワーク等で実行できなかった検証は「未確認」と明記する。ビルド成功だけでデプロイ成功とは言わない。
+
+【5. 最後に私へ渡す情報】
+・アプリの分類と理由、変更したファイル、検証結果と未確認事項
+・Cloudflare に入力する プロジェクト名（Worker 名・name と同じ）、ビルド コマンド、デプロイ コマンド、詳細設定のパス、接続するブランチ
+  A のビルドコマンドは空欄、B は実在するビルドスクリプト。npm ならデプロイは npx wrangler deploy。
+  画面の「詳細設定 → パス」はビルドを実行する場所。リポジトリ直下なら初期値 / のまま、サブフォルダーなら実際の場所を指定する。assets.directory の値とは別である。
+・プレビューコマンドが表示されている場合は画面の初期値を確認する。今回確認した画面は npx wrangler preview。wrangler pages deploy に変更しない。プレビュービルドや Cloudflare Access の設定は必要性を説明し、勝手に変更しない。
+・Cloudflare Workers の Git 接続画面で入力すること、Pages の「ビルド出力ディレクトリ」ではなく assets.directory で公開フォルダーを指定すること
+・次回の更新はローカル検証 → 自分でコミット・プッシュ → Cloudflare のデプロイ成功と公開画面の確認、という順であること
+
+Git のコマンドは実行しないでください。コミット・プッシュと本番デプロイは私が行います。
+"><div class="code-wrap"><span class="code"></span></div><button class="copy" type="button">コピー</button></div></div><p><a href="デプロイ用プロンプト.txt" download>配布用テキストをダウンロード</a></p></div>
       </div>
     </section>
 
@@ -332,6 +400,12 @@ Changes to be committed:
             </div>
           </div>
 
+          <div class="callout info"><b>やり直す人：送り先の切り替え</b>　以前 git remote add origin を実行した人は、4-6 の代わりに次を実行します。新しい URL が表示されていることを確認してください。
+            <div class="term"><div class="line" data-cmd="git remote set-url origin {URL}"><div class="code-wrap"><span class="ps" aria-hidden="true">PS C:\…&gt;</span><span class="code"></span></div><button class="copy" type="button">コピー</button></div>
+            <div class="line" data-cmd="git remote -v"><div class="code-wrap"><span class="ps" aria-hidden="true">PS C:\…&gt;</span><span class="code"></span></div><button class="copy" type="button">コピー</button></div></div>
+            <p>表示された origin の URL が新しいリポジトリなら 4-7 へ進みます。「No such remote」が出たら、4-6 の remote add を使ってください。</p>
+          </div>
+
           <div class="cmd-item">
             <div class="cmd-title"><span class="idx">4-7</span><p>GitHub に送る（プッシュ）</p></div>
             <div class="term">
@@ -368,30 +442,54 @@ branch 'main' set up to track 'origin/main'.</pre></div>
   </div>
 
   <section class="section" aria-labelledby="cf-h">
-    <h2 id="cf-h">このあと：Cloudflare でつなぐ</h2>
-    <p>Cloudflare の「アプリケーションを作成する」→「Continue with GitHub」で、このリポジトリを選びます。設定の画面では、次のように入力します。</p>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>項目</th><th>素の HTML のアプリ</th><th>Vite で作ったアプリ</th></tr></thead>
-        <tbody>
-          <tr><td>ビルドコマンド</td><td><span class="empty-val">空欄</span></td><td><code>npm run build</code></td></tr>
-          <tr><td>デプロイコマンド</td><td><code>npx wrangler deploy</code><br><small>最初から入っている。変えない</small></td><td><code>npx wrangler deploy</code><br><small>最初から入っている。変えない</small></td></tr>
-          <tr><td>ルートディレクトリ</td><td><span class="empty-val">空欄</span></td><td><span class="empty-val">空欄</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p>迷ったら、手順2で Kiro が教えてくれたコマンドを入れます。</p>
+    <h2 id="cf-h">6. Cloudflare Workers で公開する</h2>
+    <p>Cloudflare の「Workers &amp; Pages」から作成画面を開き、<strong>Worker の Git リポジトリ接続</strong>を選びます。「Continue with GitHub」などの表示から、自分のリポジトリを接続してください。画面名は変わる場合があります。</p>
+    <div class="callout"><b>画面を確認</b>　Pages 用の作成画面へ進まないでください。「ビルド出力ディレクトリ」を入力する Pages の手順ではありません。Workers は「デプロイコマンド」に <code class="inline">npx wrangler deploy</code> を使い、公開フォルダーは設定ファイルの <code class="inline">assets.directory</code> で指定します。</div>
+    <p>以下は、実際に開いた「アプリケーションをセットアップする」画面の項目名に合わせています。左右の列に同じ値がある行も、それぞれ同じ内容を使います。</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>画面の項目</th><th>そのまま配信する HTML</th><th>Vite の静的アプリ（標準構成）</th></tr></thead>
+      <tbody>
+        <tr><td>プロジェクト名<br><small>Worker の名前</small></td><td><span data-slot="REPO"></span><br><small>設定の name と一致。.git は付けない</small></td><td><span data-slot="REPO"></span><br><small>設定の name と一致。.git は付けない</small></td></tr>
+        <tr><td>ビルド コマンド（オプション）</td><td>空欄</td><td><code>npm run build</code></td></tr>
+        <tr><td>デプロイ コマンド</td><td><code>npx wrangler deploy</code></td><td><code>npx wrangler deploy</code></td></tr>
+        <tr><td>プレビューコマンド</td><td><code>npx wrangler preview</code><br><small>今回の画面の初期値</small></td><td><code>npx wrangler preview</code><br><small>今回の画面の初期値</small></td></tr>
+        <tr><td>詳細設定 → パス</td><td>直下なら <code>/</code> のまま</td><td>直下なら <code>/</code> のまま</td></tr>
+      </tbody></table></div>
+    <p><strong>「パス」は公開フォルダーではありません。</strong>ビルドを実行する場所です。アプリがリポジトリ内のサブフォルダーにある場合だけ、Kiro が確認した場所を指定します。例えば app に設定があるなら、その app フォルダーを指定します。</p>
+    <p>「プレビュービルドを有効化」と「Cloudflare Accessで保護」も表示されています。今回の画面は前者がオン、後者がオフでした。この表を入力するために切り替える必要はありません。API トークンや変数は、必要性を確認できた場合に設定します。</p>
+    <h3>画面ではなく、ファイルで指定すること</h3>
+    <div class="table-wrap"><table><thead><tr><th>確認すること</th><th>そのまま配信する HTML</th><th>Vite の静的アプリ（標準構成）</th></tr></thead><tbody>
+      <tr><td>Wrangler 設定の assets.directory</td><td>index.html と素材のある公開専用フォルダー</td><td><code>./dist</code>（実際のビルド出力先を優先）</td></tr>
+    </tbody></table></div>
+    <p>本番ブランチは、この手順で送った main を接続していることを確認します。今回のセットアップ画面にはブランチの入力欄は表示されていません。この表は静的アプリ用です。SSR・API・認証などがある場合は、Kiro が調べた Workers 対応構成を先生と確認して使います。</p>
+    <ol class="sub"><li>設定を確認してデプロイする。</li><li>ログでビルドとデプロイの両方が成功したことを確認する。<code class="inline">Build command completed</code> だけでは公開完了ではありません。</li><li>Cloudflare に表示された公開 URL を開き、画像・音声・ボタンなどを確認する。画面を再読み込みしても動くか確認する。</li></ol>
+    <div class="callout info"><b>dist を GitHub に送らなくてよい理由</b>　Vite の場合、Cloudflare がソースからビルドし、その場で dist を作ります。手書きの HTML や素材が入る公開フォルダーは GitHub に送る必要があります。</div>
+  </section>
+
+  <section class="section" aria-labelledby="logs-h">
+    <h2 id="logs-h">デプロイで止まったら</h2>
+    <p>最後の「Failed」だけでは原因はわかりません。失敗したコマンドと、最初の ERROR、その前後を Kiro に渡します。トークン・パスワード・秘密の環境変数は貼らないでください。</p>
+    <div class="table-wrap"><table><thead><tr><th>ログの表示</th><th>意味・確認すること</th></tr></thead><tbody>
+      <tr><td><code>Build command completed</code></td><td>ビルド完了。この後にデプロイが続きます。</td></tr>
+      <tr><td><code>Pages project</code></td><td>Pages 用設定が残っていないか確認。静的 Workers では pages_build_output_dir を assets.directory に置き換えます。pages deploy に変更しません。</td></tr>
+      <tr><td><code>Missing entry-point to Worker script or to assets directory</code></td><td>Workers が公開対象を見つけていません。静的アプリは assets.directory、サーバー処理がある構成は main や公式アダプターの出力設定を確認します。ブラウザー用 main.ts を指定しません。</td></tr>
+      <tr><td>公開フォルダーが存在しない</td><td>ビルドコマンド、出力先、ルートディレクトリの組み合わせを確認します。</td></tr>
+      <tr><td>Worker 名が一致しない</td><td>Cloudflare で選んだ Worker と設定の name を一致させます。</td></tr>
+      <tr><td>公開後に白い画面・画像が出ない</td><td>ブラウザーのエラーと素材の URL、GitHub に素材があるか確認。公開成功とアプリの正常動作は別々に確認します。</td></tr>
+    </tbody></table></div>
+    <p><strong>前回のエラーの例：</strong>ビルド成功 → Pages 用設定の警告 → Workers 用の公開対象なし → 失敗。原因はビルドではなく、デプロイ設定です。</p>
+    <p>参考：<a href="https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/">Pages と Workers の設定の違い</a> ／ <a href="https://developers.cloudflare.com/workers/ci-cd/builds/configuration/">Workers Builds の設定</a></p>
   </section>
 
   <section class="section" aria-labelledby="again-h">
     <h2 id="again-h">2回目から（アプリを直したとき）</h2>
-    <p>手順1〜3と 4-1・4-5・4-6 はもう要りません。直したら、この3つだけです。コミットは貼り付けたあと、" " の中を「何を直したか」に書き換えてから Enter を押します。</p>
+    <p>同じリポジトリ・Worker を更新する場合は、手順1〜3と 4-1・4-5・4-6 はもう要りません。新しいリポジトリでやり直す場合は、上の「一度試した人」の手順を使います。直したら、Kiro でビルドと公開しない検証（dry-run）を確認してから、次のコマンドを実行します。コミットは貼り付けたあと、" " の中を「何を直したか」に書き換えてから Enter を押します。</p>
     <div class="term">
       <div class="line" data-cmd="git add ."><div class="code-wrap"><span class="ps" aria-hidden="true">PS C:\…&gt;</span><span class="code"></span></div><button class="copy" type="button">コピー</button></div>
       <div class="line" data-cmd="git commit -m &quot;ボタンの色を直した&quot;"><div class="code-wrap"><span class="ps" aria-hidden="true">PS C:\…&gt;</span><span class="code"></span></div><button class="copy" type="button">コピー</button></div>
       <div class="line" data-cmd="git push"><div class="code-wrap"><span class="ps" aria-hidden="true">PS C:\…&gt;</span><span class="code"></span></div><button class="copy" type="button">コピー</button></div>
     </div>
-    <p class="after">プッシュすると、Cloudflare が自動でアプリを作り直します。公開ページに反映されるまで数分かかります。</p>
+    <p class="after">Workers と GitHub の連携が済んでいれば、接続した本番ブランチへのプッシュで Cloudflare が再デプロイします。ログの成功と公開ページの動作を確認してください。</p>
   </section>
 
   <section class="section" aria-labelledby="tr-h">
@@ -452,7 +550,7 @@ branch 'main' set up to track 'origin/main'.</pre></div>
     </ul>
   </section>
 
-  <p class="foot">このページのコマンドと表示は、Git for Windows 2.54 と PowerShell 5.1（Kiro のターミナル）で確認したものです。</p>
+  <p class="foot">Windows の Kiro ターミナル（PowerShell）向けの手順です。表示例は環境により異なります。Workers 向け改訂：2026年10月20日。</p>
 
 </main>
 
@@ -471,6 +569,7 @@ branch 'main' set up to track 'origin/main'.</pre></div>
   };
   var NEED = {
     URL:"手順1の欄に URL を貼ると、コピーできるようになります",
+    REPO:"手順1に授業用の名前の URL を入れると、コピーできます",
     NAME:"上の欄にユーザー名を入れると、コピーできるようになります",
     EMAIL:"上の欄にメールアドレスを入れると、コピーできるようになります"
   };
@@ -580,10 +679,11 @@ branch 'main' set up to track 'origin/main'.</pre></div>
         if (/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/.test(m[2])){
           setStatus('ok','OK です。リポジトリ名は「' + m[2] + '」。Cloudflare でもそのまま使える名前です。');
         } else {
-          setStatus('warn','リポジトリ名「' + m[2] + '」に、大文字・_・. など Cloudflare で使えない文字が入っています。GitHub のリポジトリの Settings で、小文字・数字・ハイフンだけの名前に変えてから、URL をコピーし直してください。');
+          setStatus('warn','リポジトリ名「' + m[2] + '」に、大文字・_・. など Cloudflare で使えない文字が入っています。この授業では先頭末尾を英数字とした63文字以内の小文字・数字・ハイフンの名前に揃えます。GitHub の Settings で名前を変えて URL を貼り直してください。');
         }
       }
     }
+    if (state.REPO && !/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/.test(state.REPO)) state.REPO = "";
     render();
   }
   urlIn.addEventListener('input', onUrl);
